@@ -10,8 +10,8 @@ namespace
 }
 
 //------------------------------------------------------------------------------
-Sphere::Sphere(ID3D11Device* device) 
-	: m_states(device)
+Sphere::Sphere(ID3D11Device* device)
+		: m_states(device)
 {
 	{
 		D3D11_BUFFER_DESC desc = {0};
@@ -53,9 +53,9 @@ Sphere::Draw(
 
 	effect->Apply(deviceContext);
 
-	 auto sampler = m_states.LinearWrap();
-	 deviceContext->PSSetSamplers(0, 1, &sampler);
-	 deviceContext->RSSetState(m_states.CullClockwise());
+	auto sampler = m_states.LinearWrap();
+	deviceContext->PSSetSamplers(0, 1, &sampler);
+	deviceContext->RSSetState(m_states.CullClockwise());
 
 	deviceContext->IASetIndexBuffer(m_IB.Get(), DXGI_FORMAT_R16_UINT, 0);
 

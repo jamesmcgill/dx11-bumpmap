@@ -286,11 +286,16 @@ Game::CreateDeviceDependentResources()
 
 	m_font = std::make_unique<SpriteFont>(device, L"assets/verdana.spritefont");
 
+	DX::ThrowIfFailed(CreateDDSTextureFromFile(
+		device, L"assets/earth.dds", nullptr, m_texture.ReleaseAndGetAddressOf()));
+
 	m_myEffectFactory = std::make_unique<MyEffectFactory>(device);
 
 	IEffectFactory::EffectInfo info;
 	m_myEffect = std::static_pointer_cast<MyEffect>(
 		m_myEffectFactory->CreateEffect(info, context));
+	m_myEffect->SetTexture(m_texture.Get());
+	m_myEffect->SetTextureEnabled(true);
 
 	m_sphere = std::make_unique<Sphere>(device);
 	m_sphere->CreateInputLayout(device, m_myEffect.get(), &m_inputLayout);
@@ -335,6 +340,7 @@ Game::OnDeviceLost()
 	m_fontSpriteBatch.reset();
 	m_grid.reset();
 	m_sphere.reset();
+	m_texture.Reset();
 	m_inputLayout.Reset();
 	m_myEffect.reset();
 	m_myEffectFactory.reset();

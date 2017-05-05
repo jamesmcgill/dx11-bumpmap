@@ -24,7 +24,9 @@ struct VertexShaderInput
 {
 	float3 pos : SV_Position;
 	float3 normal: NORMAL;
-	float2 texCoord: TEXCOORD;
+	float3 tangent: TANGENT;
+	float3 color: COLOR;
+	float2 texCoord: TEXCOORD0;
 };
 
 //------------------------------------------------------------------------------
@@ -33,6 +35,7 @@ struct VertexShaderInput
 struct PixelShaderInput
 {
 	float4 pos : SV_POSITION;
+	float2 texCoord: TEXCOORD0;
 	float3 normal : NORMAL;
 	float3 eyeRay: TEXCOORD2;
 };
@@ -51,6 +54,8 @@ PixelShaderInput main(VertexShaderInput input)
 	pos = mul(worldPos, view);
 	pos = mul(pos, projection);
 	output.pos = pos;
+
+	output.texCoord = input.texCoord;
 
 	// transform the normal
 	output.normal = mul(normal, model).xyz;

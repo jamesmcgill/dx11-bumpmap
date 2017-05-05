@@ -23,15 +23,24 @@ cbuffer DynamicBuffer : register(b1)
 struct PixelShaderInput
 {
 	float4 pos : SV_POSITION;
+	float2 texCoord: TEXCOORD0;
 	float3 normal : NORMAL;
 	float3 eyeRay: TEXCOORD2;
 };
+
+//------------------------------------------------------------------------------
+// Textures and Samplers
+//------------------------------------------------------------------------------
+Texture2D ColorMap : register(t0);
+SamplerState ColorMapSampler : register(s0);
 
 //------------------------------------------------------------------------------
 // A pass-through function for the (interpolated) color data. 
 //------------------------------------------------------------------------------
 float4 main(PixelShaderInput input) : SV_TARGET
 {
+	float4 texColor = ColorMap.Sample(ColorMapSampler, input.texCoord);
+
 	float3 lightRay = normalize(-lightDir.xyz);
 	float3 viewDir = normalize(input.eyeRay);
 
@@ -48,7 +57,9 @@ float4 main(PixelShaderInput input) : SV_TARGET
 		saturate(dot(reflect, viewDir))
 		, 32);
 
-	return (ambientIC) + (diffuse * diffuseIC) + (specular * specularIC);
+	float4 color = (0.2 * texColor) + (diffuse * texColor);
+	color.w = 1.0;
+	return color + (specular * specularIC);
 }
 
 //------------------------------------------------------------------------------

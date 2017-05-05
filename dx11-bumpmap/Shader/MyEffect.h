@@ -30,6 +30,10 @@ public:
 		DirectX::CXMMATRIX view,
 		DirectX::CXMMATRIX projection) override;
 
+	// MyEffect
+	void SetTextureEnabled(bool value);
+	void SetTexture(_In_opt_ ID3D11ShaderResourceView* value);
+
 private:
 	class Impl;
 	std::unique_ptr<Impl> m_pImpl;

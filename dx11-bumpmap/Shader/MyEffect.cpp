@@ -31,15 +31,17 @@ public:
 	XMMATRIX m_view;
 	XMMATRIX m_projection;
 
+	bool m_isTextured = false;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_staticConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_dynamicConstantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
 	StaticConstantBuffer m_staticData;
 	DynamicConstantBuffer m_dynamicData;
-
 	std::vector<uint8_t> m_VSBytecode;
 
+public:
 	MyEffect::Impl(_In_ ID3D11Device* device);
 	void Apply(_In_ ID3D11DeviceContext* deviceContext);
 	void GetVertexShaderBytecode(
@@ -81,11 +83,11 @@ MyEffect::Impl::Impl(_In_ ID3D11Device* device)
 		&dynamicBufferDesc, nullptr, &m_dynamicConstantBuffer));
 
 	// Populate Static Data
-	static const XMVECTORF32 modelColor	= {1.0f,  0.0f,  0.0f,  1.0f};
-	static const XMVECTORF32 ambientIC	= {0.3f,  0.27f, 0.24f, 1.0f};
-	static const XMVECTORF32 diffuseIC	= {0.7f,  0.7f,  0.7f,  1.0f};
-	static const XMVECTORF32 specularIC	= {1.0f,  1.0f,  1.0f,  1.0f};
-	static const XMVECTORF32 lightDir		= {0.6f,  0.0f, -1.0f,  0.0f};
+	static const XMVECTORF32 modelColor = {1.0f, 0.0f, 0.0f, 1.0f};
+	static const XMVECTORF32 ambientIC	= {0.3f, 0.27f, 0.24f, 1.0f};
+	static const XMVECTORF32 diffuseIC	= {0.7f, 0.7f, 0.7f, 1.0f};
+	static const XMVECTORF32 specularIC = {1.0f, 1.0f, 1.0f, 1.0f};
+	static const XMVECTORF32 lightDir		= {0.6f, 0.0f, -1.0f, 0.0f};
 
 	XMStoreFloat4(&m_staticData.modelColor, modelColor);
 	XMStoreFloat4(&m_staticData.ambientIC, ambientIC);
@@ -127,6 +129,11 @@ MyEffect::Impl::Apply(_In_ ID3D11DeviceContext* deviceContext)
 		1, 1, m_dynamicConstantBuffer.GetAddressOf());
 	deviceContext->PSSetConstantBuffers(
 		1, 1, m_dynamicConstantBuffer.GetAddressOf());
+
+	if (m_isTextured) {
+		ID3D11ShaderResourceView* textures[1] = { m_texture.Get() };
+		deviceContext->PSSetShaderResources(0, 1, textures);
+	}
 
 	deviceContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	deviceContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
@@ -230,6 +237,20 @@ MyEffect::SetMatrices(FXMMATRIX world, CXMMATRIX view, CXMMATRIX projection)
 	m_pImpl->m_world			= world;
 	m_pImpl->m_view				= view;
 	m_pImpl->m_projection = projection;
+}
+
+//------------------------------------------------------------------------------
+void
+MyEffect::SetTextureEnabled(bool value)
+{
+	m_pImpl->m_isTextured = value;
+}
+
+//------------------------------------------------------------------------------
+void
+MyEffect::SetTexture(_In_opt_ ID3D11ShaderResourceView* value)
+{
+	m_pImpl->m_texture = value;
 }
 
 //------------------------------------------------------------------------------

@@ -57,6 +57,7 @@ private:
 
 	// Visuals
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
 	std::unique_ptr<Sphere> m_sphere;
 	std::unique_ptr<MyEffectFactory> m_myEffectFactory;
 	std::shared_ptr<MyEffect> m_myEffect;
@@ -71,6 +72,6 @@ private:
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 	float m_rotationRadiansPS = 0.0f;
-	float m_cameraRotationX = 0.0f;
-	float m_cameraRotationY = 0.0f;
+	float m_cameraRotationX		= 0.0f;
+	float m_cameraRotationY		= 0.0f;
 };
