@@ -1,7 +1,6 @@
-# dx11-specular-teapot
-<img src="teapot.jpg" width="457px"></img>
+# dx11-bumpmap
 
-Simple DirectX 11 Utah Teapot project using DirectXTK.
+Simple DirectX 11 project using DirectXTK.
 Replaces the DirectXTK standard effect types with a version that allows for writing custom vertex and pixel shaders to play around with.
 
 After cloning ensure the submodules are available with `git submodule update --init`

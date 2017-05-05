@@ -53,7 +53,7 @@ wWinMain(
 		wcex.hCursor			 = LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 		wcex.lpszMenuName	= nullptr;
-		wcex.lpszClassName = L"dx11_specular_teapotWindowClass";
+		wcex.lpszClassName = L"dx11_bumpmapWindowClass";
 		wcex.hIconSm			 = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 		if (!RegisterClassEx(&wcex)) return 1;
 
@@ -71,8 +71,8 @@ wWinMain(
 
 		HWND hwnd = CreateWindowEx(
 			0,
-			L"dx11_specular_teapotWindowClass",
-			L"dx11-specular-teapot",
+			L"dx11_bumpmapWindowClass",
+			L"dx11-bumpmap",
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -83,7 +83,7 @@ wWinMain(
 			hInstance,
 			nullptr);
 		// TODO: Change to CreateWindowEx(WS_EX_TOPMOST,
-		// L"dx11_specular_teapotWindowClass", L"dx11-specular-teapot", WS_POPUP, to
+		// L"dx11_bumpmapWindowClass", L"dx11-bumpmap", WS_POPUP, to
 		// default to fullscreen.
 
 		if (!hwnd) return 1;

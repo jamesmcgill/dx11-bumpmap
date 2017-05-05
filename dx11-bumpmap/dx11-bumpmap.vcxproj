@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <RootNamespace>dx11_specular_teapot</RootNamespace>
+    <RootNamespace>dx11-bumpmap</RootNamespace>
     <ProjectGuid>{2ef18d1c-cf88-4942-8a68-8aa1f3f639d4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
@@ -213,7 +213,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="dx11-specular-teapot.rc" />
+    <ResourceCompile Include="dx11-bumpmap.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\verdana.spritefont" />

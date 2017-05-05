@@ -65,7 +65,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="dx11-specular-teapot.rc" />
+    <ResourceCompile Include="dx11-bumpmap.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\verdana.spritefont">

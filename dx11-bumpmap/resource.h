@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by dx11-specular-teapot.rc
+// Used by dx11-bumpmap.rc
 //
 #define IDI_ICON1                       104
 
