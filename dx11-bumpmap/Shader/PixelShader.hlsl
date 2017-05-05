@@ -54,10 +54,10 @@ float4 main(PixelShaderInput input) : SV_TARGET
 	float3 reflect = normalize(2 * cosLight * normal - lightRay);
 
 	// Spec = R.V
-	float specular = 
-		pow(
-		saturate(dot(reflect, viewDir))
-		, 32);
+	float specular = pow(saturate(dot(reflect, viewDir)), 4);
+
+	// Specular only on gloss map area
+	specular = min(specular, 1.0 - texColor.w);
 
 	float4 color = (0.2 * texColor) + (diffuse * texColor);
 	color.w = 1.0;
