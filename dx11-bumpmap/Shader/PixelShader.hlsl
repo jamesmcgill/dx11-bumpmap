@@ -25,6 +25,7 @@ struct PixelShaderInput
 	float4 pos : SV_POSITION;
 	float2 texCoord: TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 light : TEXCOORD1;
 	float3 eyeRay: TEXCOORD2;
 };
 
@@ -32,19 +33,20 @@ struct PixelShaderInput
 // Textures and Samplers
 //------------------------------------------------------------------------------
 Texture2D ColorMap : register(t0);
-SamplerState ColorMapSampler : register(s0);
+SamplerState Sampler : register(s0);
+Texture2D NormalMap : register(t1);
 
 //------------------------------------------------------------------------------
 // A pass-through function for the (interpolated) color data. 
 //------------------------------------------------------------------------------
 float4 main(PixelShaderInput input) : SV_TARGET
 {
-	float4 texColor = ColorMap.Sample(ColorMapSampler, input.texCoord);
+	float4 texColor = ColorMap.Sample(Sampler, input.texCoord);
+	float3 normal = ((2 * NormalMap.Sample(Sampler, input.texCoord)) - 1.0).xyz;
 
-	float3 lightRay = normalize(-lightDir.xyz);
+	float3 lightRay = normalize(-input.light.xyz);
 	float3 viewDir = normalize(input.eyeRay);
 
-	float3 normal = normalize(input.normal);
 	float cosLight = dot(normal, lightRay);
 	float diffuse = saturate(cosLight);
 

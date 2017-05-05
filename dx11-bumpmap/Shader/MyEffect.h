@@ -33,6 +33,8 @@ public:
 	// MyEffect
 	void SetTextureEnabled(bool value);
 	void SetTexture(_In_opt_ ID3D11ShaderResourceView* value);
+	void SetNormalMapEnabled(bool value);
+	void SetNormalMap(_In_opt_ ID3D11ShaderResourceView* value);
 
 private:
 	class Impl;

@@ -186,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\earth.dds" />
+    <Image Include="Assets\normal.dds" />
     <Image Include="directx.ico" />
   </ItemGroup>
   <ItemGroup>

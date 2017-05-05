@@ -55,6 +55,9 @@
     <Image Include="Assets\earth.dds">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="Assets\normal.dds">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest">

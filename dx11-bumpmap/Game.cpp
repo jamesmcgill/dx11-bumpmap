@@ -142,7 +142,7 @@ Game::Render()
 void
 Game::PositionCamera()
 {
-	static const Vector4 eye = {0.0f, 0.7f, 1.2f, 0.0f};
+	static const Vector4 eye = {0.0f, 0.5f, 1.0f, 0.0f};
 	static const Vector4 at	= {0.0f, -0.1f, 0.0f, 0.0f};
 	static const Vector4 up	= {0.0f, 1.0f, 0.0f, 0.0f};
 
@@ -288,6 +288,8 @@ Game::CreateDeviceDependentResources()
 
 	DX::ThrowIfFailed(CreateDDSTextureFromFile(
 		device, L"assets/earth.dds", nullptr, m_texture.ReleaseAndGetAddressOf()));
+	DX::ThrowIfFailed(CreateDDSTextureFromFile(
+		device, L"assets/normal.dds", nullptr, m_normalMap.ReleaseAndGetAddressOf()));
 
 	m_myEffectFactory = std::make_unique<MyEffectFactory>(device);
 
@@ -296,6 +298,8 @@ Game::CreateDeviceDependentResources()
 		m_myEffectFactory->CreateEffect(info, context));
 	m_myEffect->SetTexture(m_texture.Get());
 	m_myEffect->SetTextureEnabled(true);
+	m_myEffect->SetNormalMap(m_normalMap.Get());
+	m_myEffect->SetNormalMapEnabled(true);
 
 	m_sphere = std::make_unique<Sphere>(device);
 	m_sphere->CreateInputLayout(device, m_myEffect.get(), &m_inputLayout);
@@ -340,6 +344,7 @@ Game::OnDeviceLost()
 	m_fontSpriteBatch.reset();
 	m_grid.reset();
 	m_sphere.reset();
+	m_normalMap.Reset();
 	m_texture.Reset();
 	m_inputLayout.Reset();
 	m_myEffect.reset();

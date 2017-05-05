@@ -24,8 +24,8 @@ struct VertexShaderInput
 {
 	float3 pos : SV_Position;
 	float3 normal: NORMAL;
-	float3 tangent: TANGENT;
-	float3 color: COLOR;
+	float4 tangent: TANGENT;
+	float4 color: COLOR;
 	float2 texCoord: TEXCOORD0;
 };
 
@@ -37,6 +37,7 @@ struct PixelShaderInput
 	float4 pos : SV_POSITION;
 	float2 texCoord: TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 light : TEXCOORD1;
 	float3 eyeRay: TEXCOORD2;
 };
 
@@ -55,13 +56,21 @@ PixelShaderInput main(VertexShaderInput input)
 	pos = mul(pos, projection);
 	output.pos = pos;
 
+	// Matrix from world space to tangent space
+	float4 biTangentAxis = float4(cross(input.tangent.xyz, input.normal), 0.0f);
+	float3x3 worldToTangentSpace;
+	worldToTangentSpace[0] = mul(input.tangent, model).xyz;
+	worldToTangentSpace[1] = mul(biTangentAxis, model).xyz;
+	worldToTangentSpace[2] = mul(normal, model).xyz;
+
 	output.texCoord = input.texCoord;
 
 	// transform the normal
 	output.normal = mul(normal, model).xyz;
 
 	// for specular light
-	output.eyeRay = (eyePos - worldPos).xyz;
+	output.light = mul(worldToTangentSpace, lightDir.xyz);
+	output.eyeRay = mul(worldToTangentSpace, (eyePos - worldPos).xyz);
 
 	return output;
 }

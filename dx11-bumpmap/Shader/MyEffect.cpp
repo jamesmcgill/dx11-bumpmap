@@ -31,12 +31,14 @@ public:
 	XMMATRIX m_view;
 	XMMATRIX m_projection;
 
-	bool m_isTextured = false;
+	bool m_isTextured			= false;
+	bool m_isNormalMapped = false;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_staticConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_dynamicConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_normalMap;
 	StaticConstantBuffer m_staticData;
 	DynamicConstantBuffer m_dynamicData;
 	std::vector<uint8_t> m_VSBytecode;
@@ -130,10 +132,16 @@ MyEffect::Impl::Apply(_In_ ID3D11DeviceContext* deviceContext)
 	deviceContext->PSSetConstantBuffers(
 		1, 1, m_dynamicConstantBuffer.GetAddressOf());
 
+	std::vector<ID3D11ShaderResourceView*> textures;
+	textures.reserve(2);
 	if (m_isTextured) {
-		ID3D11ShaderResourceView* textures[1] = { m_texture.Get() };
-		deviceContext->PSSetShaderResources(0, 1, textures);
+		textures.push_back(m_texture.Get());
 	}
+	if (m_isNormalMapped) {
+		textures.push_back(m_normalMap.Get());
+	}
+	deviceContext->PSSetShaderResources(
+		0, static_cast<UINT>(textures.size()), textures.data());
 
 	deviceContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	deviceContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
@@ -251,6 +259,20 @@ void
 MyEffect::SetTexture(_In_opt_ ID3D11ShaderResourceView* value)
 {
 	m_pImpl->m_texture = value;
+}
+
+//------------------------------------------------------------------------------
+void
+MyEffect::SetNormalMapEnabled(bool value)
+{
+	m_pImpl->m_isNormalMapped = value;
+}
+
+//------------------------------------------------------------------------------
+void
+MyEffect::SetNormalMap(_In_opt_ ID3D11ShaderResourceView* value)
+{
+	m_pImpl->m_normalMap = value;
 }
 
 //------------------------------------------------------------------------------

@@ -58,6 +58,7 @@ private:
 	// Visuals
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_normalMap;
 	std::unique_ptr<Sphere> m_sphere;
 	std::unique_ptr<MyEffectFactory> m_myEffectFactory;
 	std::shared_ptr<MyEffect> m_myEffect;
