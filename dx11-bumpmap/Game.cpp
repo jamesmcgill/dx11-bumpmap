@@ -128,7 +128,7 @@ Game::Render()
 	m_myEffect->SetWorld(m_modelWorld);
 
 	m_grid->Render(m_gridWorld, m_view, m_proj, context);
-	m_teapotMesh->Draw(m_myEffect.get(), m_inputLayout.Get());
+	m_sphere->Draw(context, m_myEffect.get(), m_inputLayout.Get());
 
 	DrawHUD();
 
@@ -292,9 +292,8 @@ Game::CreateDeviceDependentResources()
 	m_myEffect = std::static_pointer_cast<MyEffect>(
 		m_myEffectFactory->CreateEffect(info, context));
 
-	m_teapotMesh = GeometricPrimitive::CreateTeapot(context);
-
-	m_teapotMesh->CreateInputLayout(m_myEffect.get(), &m_inputLayout);
+	m_sphere = std::make_unique<Sphere>(device);
+	m_sphere->CreateInputLayout(device, m_myEffect.get(), &m_inputLayout);
 
 	m_grid = std::make_unique<Grid>(device, context);
 
@@ -312,7 +311,7 @@ Game::CreateWindowSizeDependentResources()
 	float aspectRatio			= float(outputSize.right - outputSize.left)
 											/ (outputSize.bottom - outputSize.top);
 
-	m_gridWorld	= XMMatrixTranslation(0.0f, -0.3f, 0.0f);
+	m_gridWorld	= XMMatrixTranslation(0.0f, -0.5f, 0.0f);
 	m_modelWorld = Matrix::Identity;
 	m_view			 = Matrix::Identity;
 	m_proj			 = Matrix::CreatePerspectiveFieldOfView(
@@ -335,7 +334,7 @@ Game::OnDeviceLost()
 {
 	m_fontSpriteBatch.reset();
 	m_grid.reset();
-	m_teapotMesh.reset();
+	m_sphere.reset();
 	m_inputLayout.Reset();
 	m_myEffect.reset();
 	m_myEffectFactory.reset();

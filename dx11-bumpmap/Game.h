@@ -5,6 +5,7 @@
 #include "Shader/MyEffect.h"
 #include "Shader/MyEffectFactory.h"
 #include "Grid.h"
+#include "Sphere.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -56,7 +57,7 @@ private:
 
 	// Visuals
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-	std::unique_ptr<DirectX::GeometricPrimitive> m_teapotMesh;
+	std::unique_ptr<Sphere> m_sphere;
 	std::unique_ptr<MyEffectFactory> m_myEffectFactory;
 	std::shared_ptr<MyEffect> m_myEffect;
 	std::unique_ptr<Grid> m_grid;

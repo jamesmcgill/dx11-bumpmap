@@ -166,6 +166,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader\MyEffect.h" />
     <ClInclude Include="Shader\MyEffectFactory.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +182,7 @@
     </ClCompile>
     <ClCompile Include="Shader\MyEffect.cpp" />
     <ClCompile Include="Shader\MyEffectFactory.cpp" />
+    <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico" />
