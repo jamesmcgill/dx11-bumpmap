@@ -1,3 +1,7 @@
+# All the files should be detected as C++
+# https://github.com/github/linguist#troubleshooting
+*.inc linguist-language=C++
+
 ###############################################################################
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
