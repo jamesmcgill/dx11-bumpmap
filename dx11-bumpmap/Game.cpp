@@ -32,10 +32,17 @@ Game::Initialize(HWND window, int width, int height)
 	m_deviceResources->SetWindow(window, width, height);
 
 	m_deviceResources->CreateDeviceResources();
-	CreateDeviceDependentResources();
+	if (FAILED(CreateDeviceDependentResources())) {
+		ExitGame();
+		return;
+	}
 
 	m_deviceResources->CreateWindowSizeDependentResources();
-	CreateWindowSizeDependentResources();
+
+	if (FAILED(CreateWindowSizeDependentResources())) {
+		ExitGame();
+		return;
+	}
 
 	// TODO: Change the timer settings if you want something other than the
 	// default variable timestep mode. e.g. for 60 FPS fixed timestep update
@@ -124,7 +131,6 @@ Game::Render()
 
 	PositionCamera();
 	m_myEffect->SetView(m_view);
-
 	m_myEffect->SetWorld(m_modelWorld);
 
 	m_grid->Render(m_gridWorld, m_view, m_proj, context);
@@ -243,7 +249,9 @@ Game::OnWindowSizeChanged(int width, int height)
 {
 	if (!m_deviceResources->WindowSizeChanged(width, height)) return;
 
-	CreateWindowSizeDependentResources();
+	if (FAILED(CreateWindowSizeDependentResources())) {
+		ExitGame();
+	}
 
 	// TODO: Game window is being resized.
 }
@@ -263,7 +271,7 @@ Game::GetDefaultSize(int& width, int& height) const
 //------------------------------------------------------------------------------
 // These are the resources that depend on the device.
 //------------------------------------------------------------------------------
-void
+HRESULT
 Game::CreateDeviceDependentResources()
 {
 	auto device	= m_deviceResources->GetD3DDevice();
@@ -281,18 +289,28 @@ Game::CreateDeviceDependentResources()
 		TRUE,
 		TRUE);
 
-	DX::ThrowIfFailed(device->CreateRasterizerState(
-		&rastDesc, m_raster.ReleaseAndGetAddressOf()));
+	try
+	{
+		DX::ThrowIfFailed(device->CreateRasterizerState(
+			&rastDesc, m_raster.ReleaseAndGetAddressOf()));
 
-	m_font = std::make_unique<SpriteFont>(device, L"assets/verdana.spritefont");
+		m_font = std::make_unique<SpriteFont>(device, L"assets/verdana.spritefont");
 
-	DX::ThrowIfFailed(CreateDDSTextureFromFile(
-		device, L"assets/earth.dds", nullptr, m_texture.ReleaseAndGetAddressOf()));
-	DX::ThrowIfFailed(CreateDDSTextureFromFile(
-		device,
-		L"assets/normal.dds",
-		nullptr,
-		m_normalMap.ReleaseAndGetAddressOf()));
+		DX::ThrowIfFailed(CreateDDSTextureFromFile(
+			device,
+			L"assets/earth.dds",
+			nullptr,
+			m_texture.ReleaseAndGetAddressOf()));
+		DX::ThrowIfFailed(CreateDDSTextureFromFile(
+			device,
+			L"assets/normal.dds",
+			nullptr,
+			m_normalMap.ReleaseAndGetAddressOf()));
+	}
+	catch (...)
+	{
+		return E_FAIL;
+	}
 
 	m_myEffectFactory = std::make_unique<MyEffectFactory>(device);
 
@@ -310,12 +328,14 @@ Game::CreateDeviceDependentResources()
 	m_grid = std::make_unique<Grid>(device, context);
 
 	m_fontSpriteBatch = std::make_unique<SpriteBatch>(context);
+
+	return S_OK;
 }
 
 //------------------------------------------------------------------------------
 // Allocate all memory resources that change on a window SizeChanged event.
 //------------------------------------------------------------------------------
-void
+HRESULT
 Game::CreateWindowSizeDependentResources()
 {
 	const float fovAngleY = 70.0f * XM_PI / 180.0f;
@@ -338,6 +358,8 @@ Game::CreateWindowSizeDependentResources()
 	m_fontOrigin.y			= 0.f;
 	m_fontPos.x					= size.right / 2.f;
 	m_fontPos.y					= static_cast<float>(size.top);
+
+	return S_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -360,9 +382,15 @@ Game::OnDeviceLost()
 void
 Game::OnDeviceRestored()
 {
-	CreateDeviceDependentResources();
+	if (FAILED(CreateDeviceDependentResources())) {
+		ExitGame();
+		return;
+	}
 
-	CreateWindowSizeDependentResources();
+	if (FAILED(CreateWindowSizeDependentResources())) {
+		ExitGame();
+		return;
+	}
 }
 #pragma endregion
 

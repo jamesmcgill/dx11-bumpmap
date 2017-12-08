@@ -21,9 +21,7 @@ Sphere::Sphere(ID3D11Device* device)
 
 		D3D11_SUBRESOURCE_DATA initData = {0};
 		initData.pSysMem								= g_sphereVB;
-
-		DX::ThrowIfFailed(
-			device->CreateBuffer(&desc, &initData, m_VB.ReleaseAndGetAddressOf()));
+		device->CreateBuffer(&desc, &initData, m_VB.ReleaseAndGetAddressOf());
 	}
 
 	{
@@ -34,9 +32,7 @@ Sphere::Sphere(ID3D11Device* device)
 
 		D3D11_SUBRESOURCE_DATA initData = {0};
 		initData.pSysMem								= g_sphereIB;
-
-		DX::ThrowIfFailed(
-			device->CreateBuffer(&desc, &initData, m_IB.ReleaseAndGetAddressOf()));
+		device->CreateBuffer(&desc, &initData, m_IB.ReleaseAndGetAddressOf());
 	}
 }
 
@@ -49,16 +45,17 @@ Sphere::Draw(
 {
 	assert(deviceContext != 0);
 	assert(effect != 0);
-	assert(inputLayout != 0);
+
+	if (!inputLayout) {
+		return;
+	}
 
 	effect->Apply(deviceContext);
 
 	auto sampler = m_states.LinearWrap();
 	deviceContext->PSSetSamplers(0, 1, &sampler);
 	deviceContext->RSSetState(m_states.CullClockwise());
-
 	deviceContext->IASetIndexBuffer(m_IB.Get(), DXGI_FORMAT_R16_UINT, 0);
-
 	deviceContext->IASetInputLayout(inputLayout);
 
 	UINT stride = sizeof(VertexPositionNormalTangentColorTexture);
@@ -67,7 +64,6 @@ Sphere::Draw(
 		0, 1, m_VB.GetAddressOf(), &stride, &offset);
 
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 	deviceContext->DrawIndexed(_countof(g_sphereIB), 0, 0);
 }
 
@@ -76,18 +72,20 @@ void
 Sphere::CreateInputLayout(
 	ID3D11Device* device, IEffect* effect, ID3D11InputLayout** pInputLayout) const
 {
-	assert(pInputLayout != 0);
-
 	void const* shaderByteCode;
 	size_t byteCodeLength;
 	effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-	DX::ThrowIfFailed(device->CreateInputLayout(
+	if (byteCodeLength == 0) {
+		return;
+	}
+
+	device->CreateInputLayout(
 		VertexPositionNormalTangentColorTexture::InputElements,
 		VertexPositionNormalTangentColorTexture::InputElementCount,
 		shaderByteCode,
 		byteCodeLength,
-		pInputLayout));
+		pInputLayout);
 }
 
 //------------------------------------------------------------------------------

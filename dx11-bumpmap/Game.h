@@ -43,8 +43,8 @@ private:
 	void DrawHUD();
 	void Clear();
 
-	void CreateDeviceDependentResources();
-	void CreateWindowSizeDependentResources();
+	HRESULT CreateDeviceDependentResources();
+	HRESULT CreateWindowSizeDependentResources();
 
 	// Device resources.
 	std::unique_ptr<DX::DeviceResources> m_deviceResources;
