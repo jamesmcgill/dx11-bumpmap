@@ -10,17 +10,17 @@ using Microsoft::WRL::ComPtr;
 
 //------------------------------------------------------------------------------
 constexpr float ROTATION_DEGREES_PER_SECOND = 45.f;
-constexpr float CAMERA_SPEED_X							= 1.0f;
-constexpr float CAMERA_SPEED_Y							= 1.0f;
-constexpr wchar_t HUD_TEXT[]								= L"Arrow Keys: rotate camera";
+constexpr float CAMERA_SPEED_X              = 1.0f;
+constexpr float CAMERA_SPEED_Y              = 1.0f;
+constexpr wchar_t HUD_TEXT[]                = L"Arrow Keys: rotate camera";
 
 //------------------------------------------------------------------------------
 Game::Game()
-		: m_keyboard(std::make_unique<Keyboard>())
-		, m_rotationRadiansPS(XMConvertToRadians(ROTATION_DEGREES_PER_SECOND))
+    : m_keyboard(std::make_unique<Keyboard>())
+    , m_rotationRadiansPS(XMConvertToRadians(ROTATION_DEGREES_PER_SECOND))
 {
-	m_deviceResources = std::make_unique<DX::DeviceResources>();
-	m_deviceResources->RegisterDeviceNotify(this);
+  m_deviceResources = std::make_unique<DX::DeviceResources>();
+  m_deviceResources->RegisterDeviceNotify(this);
 }
 
 //------------------------------------------------------------------------------
@@ -29,28 +29,30 @@ Game::Game()
 void
 Game::Initialize(HWND window, int width, int height)
 {
-	m_deviceResources->SetWindow(window, width, height);
+  m_deviceResources->SetWindow(window, width, height);
 
-	m_deviceResources->CreateDeviceResources();
-	if (FAILED(CreateDeviceDependentResources())) {
-		ExitGame();
-		return;
-	}
+  m_deviceResources->CreateDeviceResources();
+  if (FAILED(CreateDeviceDependentResources()))
+  {
+    ExitGame();
+    return;
+  }
 
-	m_deviceResources->CreateWindowSizeDependentResources();
+  m_deviceResources->CreateWindowSizeDependentResources();
 
-	if (FAILED(CreateWindowSizeDependentResources())) {
-		ExitGame();
-		return;
-	}
+  if (FAILED(CreateWindowSizeDependentResources()))
+  {
+    ExitGame();
+    return;
+  }
 
-	// TODO: Change the timer settings if you want something other than the
-	// default variable timestep mode. e.g. for 60 FPS fixed timestep update
-	// logic, call:
-	/*
-	m_timer.SetFixedTimeStep(true);
-	m_timer.SetTargetElapsedSeconds(1.0 / 60);
-	*/
+  // TODO: Change the timer settings if you want something other than the
+  // default variable timestep mode. e.g. for 60 FPS fixed timestep update
+  // logic, call:
+  /*
+  m_timer.SetFixedTimeStep(true);
+  m_timer.SetTargetElapsedSeconds(1.0 / 60);
+  */
 }
 
 #pragma region Frame Update
@@ -60,9 +62,9 @@ Game::Initialize(HWND window, int width, int height)
 void
 Game::Tick()
 {
-	m_timer.Tick([&]() { Update(m_timer); });
+  m_timer.Tick([&]() { Update(m_timer); });
 
-	Render();
+  Render();
 }
 
 //------------------------------------------------------------------------------
@@ -71,43 +73,46 @@ Game::Tick()
 void
 Game::Update(DX::StepTimer const& timer)
 {
-	HandleInput(timer);
+  HandleInput(timer);
 
-	float totalTimeS = static_cast<float>(timer.GetTotalSeconds());
+  float totalTimeS = static_cast<float>(timer.GetTotalSeconds());
 
-	// Implicit Model Rotation
-	double totalRotation = totalTimeS * m_rotationRadiansPS;
-	float radians				 = static_cast<float>(fmod(totalRotation, XM_2PI));
-	m_modelWorld				 = XMMatrixRotationY(radians);
+  // Implicit Model Rotation
+  double totalRotation = totalTimeS * m_rotationRadiansPS;
+  float radians        = static_cast<float>(fmod(totalRotation, XM_2PI));
+  m_modelWorld         = XMMatrixRotationY(radians);
 }
 
 //------------------------------------------------------------------------------
 void
 Game::HandleInput(DX::StepTimer const& timer)
 {
-	float elapsedTimeS = static_cast<float>(timer.GetElapsedSeconds());
+  float elapsedTimeS = static_cast<float>(timer.GetElapsedSeconds());
 
-	// Handle Keyboard Input
-	auto kbState = m_keyboard->GetState();
-	if (kbState.Escape) {
-		ExitGame();
-	}
+  // Handle Keyboard Input
+  auto kbState = m_keyboard->GetState();
+  if (kbState.Escape)
+  {
+    ExitGame();
+  }
 
-	if (kbState.Up) {
-		m_cameraRotationX -= elapsedTimeS * CAMERA_SPEED_X;
-	}
-	else if (kbState.Down)
-	{
-		m_cameraRotationX += elapsedTimeS * CAMERA_SPEED_X;
-	}
+  if (kbState.Up)
+  {
+    m_cameraRotationX -= elapsedTimeS * CAMERA_SPEED_X;
+  }
+  else if (kbState.Down)
+  {
+    m_cameraRotationX += elapsedTimeS * CAMERA_SPEED_X;
+  }
 
-	if (kbState.Left) {
-		m_cameraRotationY -= elapsedTimeS * CAMERA_SPEED_Y;
-	}
-	else if (kbState.Right)
-	{
-		m_cameraRotationY += elapsedTimeS * CAMERA_SPEED_Y;
-	}
+  if (kbState.Left)
+  {
+    m_cameraRotationY -= elapsedTimeS * CAMERA_SPEED_Y;
+  }
+  else if (kbState.Right)
+  {
+    m_cameraRotationY += elapsedTimeS * CAMERA_SPEED_Y;
+  }
 }
 #pragma endregion
 
@@ -118,70 +123,71 @@ Game::HandleInput(DX::StepTimer const& timer)
 void
 Game::Render()
 {
-	// Don't try to render anything before the first Update.
-	if (m_timer.GetFrameCount() == 0) {
-		return;
-	}
+  // Don't try to render anything before the first Update.
+  if (m_timer.GetFrameCount() == 0)
+  {
+    return;
+  }
 
-	Clear();
+  Clear();
 
-	m_deviceResources->PIXBeginEvent(L"Render");
-	auto context = m_deviceResources->GetD3DDeviceContext();
-	context->RSSetState(m_raster.Get());
+  m_deviceResources->PIXBeginEvent(L"Render");
+  auto context = m_deviceResources->GetD3DDeviceContext();
+  context->RSSetState(m_raster.Get());
 
-	PositionCamera();
-	m_myEffect->SetView(m_view);
-	m_myEffect->SetWorld(m_modelWorld);
+  PositionCamera();
+  m_myEffect->SetView(m_view);
+  m_myEffect->SetWorld(m_modelWorld);
 
-	m_grid->Render(m_gridWorld, m_view, m_proj, context);
-	m_sphere->Draw(context, m_myEffect.get(), m_inputLayout.Get());
+  m_grid->Render(m_gridWorld, m_view, m_proj, context);
+  m_sphere->Draw(context, m_myEffect.get(), m_inputLayout.Get());
 
-	DrawHUD();
+  DrawHUD();
 
-	m_deviceResources->PIXEndEvent();
+  m_deviceResources->PIXEndEvent();
 
-	// Show the new frame.
-	m_deviceResources->Present();
+  // Show the new frame.
+  m_deviceResources->Present();
 }
 
 //------------------------------------------------------------------------------
 void
 Game::PositionCamera()
 {
-	static const Vector4 eye = {0.0f, 0.5f, 1.0f, 0.0f};
-	static const Vector4 at	= {0.0f, -0.1f, 0.0f, 0.0f};
-	static const Vector4 up	= {0.0f, 1.0f, 0.0f, 0.0f};
+  static const Vector4 eye = {0.0f, 0.5f, 1.0f, 0.0f};
+  static const Vector4 at  = {0.0f, -0.1f, 0.0f, 0.0f};
+  static const Vector4 up  = {0.0f, 1.0f, 0.0f, 0.0f};
 
-	XMVECTOR eyePos = ::XMVectorSubtract(eye, at);
+  XMVECTOR eyePos = ::XMVectorSubtract(eye, at);
 
-	float radiansX = static_cast<float>(fmod(m_cameraRotationX, XM_2PI));
-	eyePos				 = ::XMVector3Rotate(
-		eyePos, XMQuaternionRotationMatrix(XMMatrixRotationX(radiansX)));
+  float radiansX = static_cast<float>(fmod(m_cameraRotationX, XM_2PI));
+  eyePos         = ::XMVector3Rotate(
+    eyePos, XMQuaternionRotationMatrix(XMMatrixRotationX(radiansX)));
 
-	float radiansY = static_cast<float>(fmod(m_cameraRotationY, XM_2PI));
-	eyePos				 = ::XMVector3Rotate(
-		eyePos, XMQuaternionRotationMatrix(XMMatrixRotationY(radiansY)));
+  float radiansY = static_cast<float>(fmod(m_cameraRotationY, XM_2PI));
+  eyePos         = ::XMVector3Rotate(
+    eyePos, XMQuaternionRotationMatrix(XMMatrixRotationY(radiansY)));
 
-	eyePos = ::XMVectorAdd(eyePos, at);
+  eyePos = ::XMVectorAdd(eyePos, at);
 
-	m_view = XMMatrixLookAtRH(eyePos, at, up);
+  m_view = XMMatrixLookAtRH(eyePos, at, up);
 }
 
 //------------------------------------------------------------------------------
 void
 Game::DrawHUD()
 {
-	m_fontSpriteBatch->Begin();
+  m_fontSpriteBatch->Begin();
 
-	m_font->DrawString(
-		m_fontSpriteBatch.get(),
-		HUD_TEXT,
-		m_fontPos,
-		Colors::Yellow,
-		0.f,
-		m_fontOrigin);
+  m_font->DrawString(
+    m_fontSpriteBatch.get(),
+    HUD_TEXT,
+    m_fontPos,
+    Colors::Yellow,
+    0.f,
+    m_fontOrigin);
 
-	m_fontSpriteBatch->End();
+  m_fontSpriteBatch->End();
 }
 
 //------------------------------------------------------------------------------
@@ -190,23 +196,23 @@ Game::DrawHUD()
 void
 Game::Clear()
 {
-	m_deviceResources->PIXBeginEvent(L"Clear");
+  m_deviceResources->PIXBeginEvent(L"Clear");
 
-	// Clear the views.
-	auto context			= m_deviceResources->GetD3DDeviceContext();
-	auto renderTarget = m_deviceResources->GetRenderTargetView();
-	auto depthStencil = m_deviceResources->GetDepthStencilView();
+  // Clear the views.
+  auto context      = m_deviceResources->GetD3DDeviceContext();
+  auto renderTarget = m_deviceResources->GetRenderTargetView();
+  auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-	context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
-	context->ClearDepthStencilView(
-		depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	context->OMSetRenderTargets(1, &renderTarget, depthStencil);
+  context->ClearRenderTargetView(renderTarget, Colors::CornflowerBlue);
+  context->ClearDepthStencilView(
+    depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+  context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
-	// Set the viewport.
-	auto viewport = m_deviceResources->GetScreenViewport();
-	context->RSSetViewports(1, &viewport);
+  // Set the viewport.
+  auto viewport = m_deviceResources->GetScreenViewport();
+  context->RSSetViewports(1, &viewport);
 
-	m_deviceResources->PIXEndEvent();
+  m_deviceResources->PIXEndEvent();
 }
 #pragma endregion
 
@@ -217,43 +223,45 @@ Game::Clear()
 void
 Game::OnActivated()
 {
-	// TODO: Game is becoming active window.
+  // TODO: Game is becoming active window.
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnDeactivated()
 {
-	// TODO: Game is becoming background window.
+  // TODO: Game is becoming background window.
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnSuspending()
 {
-	// TODO: Game is being power-suspended (or minimized).
+  // TODO: Game is being power-suspended (or minimized).
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnResuming()
 {
-	m_timer.ResetElapsedTime();
+  m_timer.ResetElapsedTime();
 
-	// TODO: Game is being power-resumed (or returning from minimize).
+  // TODO: Game is being power-resumed (or returning from minimize).
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnWindowSizeChanged(int width, int height)
 {
-	if (!m_deviceResources->WindowSizeChanged(width, height)) return;
+  if (!m_deviceResources->WindowSizeChanged(width, height))
+    return;
 
-	if (FAILED(CreateWindowSizeDependentResources())) {
-		ExitGame();
-	}
+  if (FAILED(CreateWindowSizeDependentResources()))
+  {
+    ExitGame();
+  }
 
-	// TODO: Game window is being resized.
+  // TODO: Game window is being resized.
 }
 
 //------------------------------------------------------------------------------
@@ -262,8 +270,8 @@ Game::OnWindowSizeChanged(int width, int height)
 void
 Game::GetDefaultSize(int& width, int& height) const
 {
-	width	= 1024;
-	height = 768;
+  width  = 1024;
+  height = 768;
 }
 #pragma endregion
 
@@ -274,62 +282,62 @@ Game::GetDefaultSize(int& width, int& height) const
 HRESULT
 Game::CreateDeviceDependentResources()
 {
-	auto device	= m_deviceResources->GetD3DDevice();
-	auto context = m_deviceResources->GetD3DDeviceContext();
+  auto device  = m_deviceResources->GetD3DDevice();
+  auto context = m_deviceResources->GetD3DDeviceContext();
 
-	CD3D11_RASTERIZER_DESC rastDesc(
-		D3D11_FILL_SOLID,
-		D3D11_CULL_NONE,
-		FALSE,
-		D3D11_DEFAULT_DEPTH_BIAS,
-		D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
-		D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
-		TRUE,
-		FALSE,
-		TRUE,
-		TRUE);
+  CD3D11_RASTERIZER_DESC rastDesc(
+    D3D11_FILL_SOLID,
+    D3D11_CULL_NONE,
+    FALSE,
+    D3D11_DEFAULT_DEPTH_BIAS,
+    D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+    D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
+    TRUE,
+    FALSE,
+    TRUE,
+    TRUE);
 
-	try
-	{
-		DX::ThrowIfFailed(device->CreateRasterizerState(
-			&rastDesc, m_raster.ReleaseAndGetAddressOf()));
+  try
+  {
+    DX::ThrowIfFailed(device->CreateRasterizerState(
+      &rastDesc, m_raster.ReleaseAndGetAddressOf()));
 
-		m_font = std::make_unique<SpriteFont>(device, L"assets/verdana.spritefont");
+    m_font = std::make_unique<SpriteFont>(device, L"assets/verdana.spritefont");
 
-		DX::ThrowIfFailed(CreateDDSTextureFromFile(
-			device,
-			L"assets/earth.dds",
-			nullptr,
-			m_texture.ReleaseAndGetAddressOf()));
-		DX::ThrowIfFailed(CreateDDSTextureFromFile(
-			device,
-			L"assets/normal.dds",
-			nullptr,
-			m_normalMap.ReleaseAndGetAddressOf()));
-	}
-	catch (...)
-	{
-		return E_FAIL;
-	}
+    DX::ThrowIfFailed(CreateDDSTextureFromFile(
+      device,
+      L"assets/earth.dds",
+      nullptr,
+      m_texture.ReleaseAndGetAddressOf()));
+    DX::ThrowIfFailed(CreateDDSTextureFromFile(
+      device,
+      L"assets/normal.dds",
+      nullptr,
+      m_normalMap.ReleaseAndGetAddressOf()));
+  }
+  catch (...)
+  {
+    return E_FAIL;
+  }
 
-	m_myEffectFactory = std::make_unique<MyEffectFactory>(device);
+  m_myEffectFactory = std::make_unique<MyEffectFactory>(device);
 
-	IEffectFactory::EffectInfo info;
-	m_myEffect = std::static_pointer_cast<MyEffect>(
-		m_myEffectFactory->CreateEffect(info, context));
-	m_myEffect->SetTexture(m_texture.Get());
-	m_myEffect->SetTextureEnabled(true);
-	m_myEffect->SetNormalMap(m_normalMap.Get());
-	m_myEffect->SetNormalMapEnabled(true);
+  IEffectFactory::EffectInfo info;
+  m_myEffect = std::static_pointer_cast<MyEffect>(
+    m_myEffectFactory->CreateEffect(info, context));
+  m_myEffect->SetTexture(m_texture.Get());
+  m_myEffect->SetTextureEnabled(true);
+  m_myEffect->SetNormalMap(m_normalMap.Get());
+  m_myEffect->SetNormalMapEnabled(true);
 
-	m_sphere = std::make_unique<Sphere>(device);
-	m_sphere->CreateInputLayout(device, m_myEffect.get(), &m_inputLayout);
+  m_sphere = std::make_unique<Sphere>(device);
+  m_sphere->CreateInputLayout(device, m_myEffect.get(), &m_inputLayout);
 
-	m_grid = std::make_unique<Grid>(device, context);
+  m_grid = std::make_unique<Grid>(device, context);
 
-	m_fontSpriteBatch = std::make_unique<SpriteBatch>(context);
+  m_fontSpriteBatch = std::make_unique<SpriteBatch>(context);
 
-	return S_OK;
+  return S_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -338,59 +346,61 @@ Game::CreateDeviceDependentResources()
 HRESULT
 Game::CreateWindowSizeDependentResources()
 {
-	const float fovAngleY = 70.0f * XM_PI / 180.0f;
-	RECT outputSize				= m_deviceResources->GetOutputSize();
-	float aspectRatio			= float(outputSize.right - outputSize.left)
-											/ (outputSize.bottom - outputSize.top);
+  const float fovAngleY = 70.0f * XM_PI / 180.0f;
+  RECT outputSize       = m_deviceResources->GetOutputSize();
+  float aspectRatio     = float(outputSize.right - outputSize.left)
+                      / (outputSize.bottom - outputSize.top);
 
-	m_gridWorld	= XMMatrixTranslation(0.0f, -0.5f, 0.0f);
-	m_modelWorld = Matrix::Identity;
-	m_view			 = Matrix::Identity;
-	m_proj			 = Matrix::CreatePerspectiveFieldOfView(
-		fovAngleY, aspectRatio, 0.01f, 100.f);
+  m_gridWorld  = XMMatrixTranslation(0.0f, -0.5f, 0.0f);
+  m_modelWorld = Matrix::Identity;
+  m_view       = Matrix::Identity;
+  m_proj       = Matrix::CreatePerspectiveFieldOfView(
+    fovAngleY, aspectRatio, 0.01f, 100.f);
 
-	m_myEffect->SetProjection(m_proj);
+  m_myEffect->SetProjection(m_proj);
 
-	// Position HUD
-	XMVECTOR dimensions = m_font->MeasureString(HUD_TEXT);
-	auto size						= m_deviceResources->GetOutputSize();
-	m_fontOrigin.x			= (XMVectorGetX(dimensions) / 2.f);
-	m_fontOrigin.y			= 0.f;
-	m_fontPos.x					= size.right / 2.f;
-	m_fontPos.y					= static_cast<float>(size.top);
+  // Position HUD
+  XMVECTOR dimensions = m_font->MeasureString(HUD_TEXT);
+  auto size           = m_deviceResources->GetOutputSize();
+  m_fontOrigin.x      = (XMVectorGetX(dimensions) / 2.f);
+  m_fontOrigin.y      = 0.f;
+  m_fontPos.x         = size.right / 2.f;
+  m_fontPos.y         = static_cast<float>(size.top);
 
-	return S_OK;
+  return S_OK;
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnDeviceLost()
 {
-	m_fontSpriteBatch.reset();
-	m_grid.reset();
-	m_sphere.reset();
-	m_normalMap.Reset();
-	m_texture.Reset();
-	m_inputLayout.Reset();
-	m_myEffect.reset();
-	m_myEffectFactory.reset();
-	m_font.reset();
-	m_raster.Reset();
+  m_fontSpriteBatch.reset();
+  m_grid.reset();
+  m_sphere.reset();
+  m_normalMap.Reset();
+  m_texture.Reset();
+  m_inputLayout.Reset();
+  m_myEffect.reset();
+  m_myEffectFactory.reset();
+  m_font.reset();
+  m_raster.Reset();
 }
 
 //------------------------------------------------------------------------------
 void
 Game::OnDeviceRestored()
 {
-	if (FAILED(CreateDeviceDependentResources())) {
-		ExitGame();
-		return;
-	}
+  if (FAILED(CreateDeviceDependentResources()))
+  {
+    ExitGame();
+    return;
+  }
 
-	if (FAILED(CreateWindowSizeDependentResources())) {
-		ExitGame();
-		return;
-	}
+  if (FAILED(CreateWindowSizeDependentResources()))
+  {
+    ExitGame();
+    return;
+  }
 }
 #pragma endregion
 

@@ -1,20 +1,20 @@
 cbuffer StaticBuffer : register(b0)
 {
-	float4 modelColor;
-	float4 ambientIC;
-	float4 diffuseIC;
-	float4 specularIC;
-	float4 lightDir;
+  float4 modelColor;
+  float4 ambientIC;
+  float4 diffuseIC;
+  float4 specularIC;
+  float4 lightDir;
 };
 
 //------------------------------------------------------------------------------
 cbuffer DynamicBuffer : register(b1)
 {
-	matrix model;
-	matrix view;
-	matrix projection;
-	matrix worldInverseTranspose;
-	float4 eyePos;
+  matrix model;
+  matrix view;
+  matrix projection;
+  matrix worldInverseTranspose;
+  float4 eyePos;
 };
 
 //------------------------------------------------------------------------------
@@ -22,11 +22,11 @@ cbuffer DynamicBuffer : register(b1)
 //------------------------------------------------------------------------------
 struct PixelShaderInput
 {
-	float4 pos : SV_POSITION;
-	float2 texCoord: TEXCOORD0;
-	float3 normal : NORMAL;
-	float3 light : TEXCOORD1;
-	float3 eyeRay: TEXCOORD2;
+  float4 pos : SV_POSITION;
+  float2 texCoord : TEXCOORD0;
+  float3 normal : NORMAL;
+  float3 light : TEXCOORD1;
+  float3 eyeRay : TEXCOORD2;
 };
 
 //------------------------------------------------------------------------------
@@ -37,31 +37,33 @@ SamplerState Sampler : register(s0);
 Texture2D NormalMap : register(t1);
 
 //------------------------------------------------------------------------------
-// A pass-through function for the (interpolated) color data. 
+// A pass-through function for the (interpolated) color data.
 //------------------------------------------------------------------------------
-float4 main(PixelShaderInput input) : SV_TARGET
+float4
+main(PixelShaderInput input)
+    : SV_TARGET
 {
-	float4 texColor = ColorMap.Sample(Sampler, input.texCoord);
-	float3 normal = ((2 * NormalMap.Sample(Sampler, input.texCoord)) - 1.0).xyz;
+  float4 texColor = ColorMap.Sample(Sampler, input.texCoord);
+  float3 normal   = ((2 * NormalMap.Sample(Sampler, input.texCoord)) - 1.0).xyz;
 
-	float3 lightRay = normalize(-input.light.xyz);
-	float3 viewDir = normalize(input.eyeRay);
+  float3 lightRay = normalize(-input.light.xyz);
+  float3 viewDir  = normalize(input.eyeRay);
 
-	float cosLight = dot(normal, lightRay);
-	float diffuse = saturate(cosLight);
+  float cosLight = dot(normal, lightRay);
+  float diffuse  = saturate(cosLight);
 
-	// R = 2(n.l)n -l
-	float3 reflect = normalize(2 * cosLight * normal - lightRay);
+  // R = 2(n.l)n -l
+  float3 reflect = normalize(2 * cosLight * normal - lightRay);
 
-	// Spec = R.V
-	float specular = pow(saturate(dot(reflect, viewDir)), 4);
+  // Spec = R.V
+  float specular = pow(saturate(dot(reflect, viewDir)), 4);
 
-	// Specular only on gloss map area
-	specular = min(specular, 1.0 - texColor.w);
+  // Specular only on gloss map area
+  specular = min(specular, 1.0 - texColor.w);
 
-	float4 color = (0.2 * texColor) + (diffuse * texColor);
-	color.w = 1.0;
-	return color + (specular * specularIC);
+  float4 color = (0.2 * texColor) + (diffuse * texColor);
+  color.w      = 1.0;
+  return color + (specular * specularIC);
 }
 
 //------------------------------------------------------------------------------
